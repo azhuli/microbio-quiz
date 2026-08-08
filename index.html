@@ -393,6 +393,24 @@
   .empty-state .es-icon { font-size: 3rem; margin-bottom: 12px; }
   .empty-state p { font-size: 0.9rem; }
 
+  .transfer-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .transfer-btn {
+    flex: 1;
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 0.82rem;
+    font-family: 'Noto Sans TC', sans-serif;
+    color: var(--text-2);
+    cursor: pointer;
+  }
+  .transfer-btn:hover { border-color: var(--primary); color: var(--primary); }
+
   /* responsive */
   @media (max-width: 500px) {
     .topbar-stats { gap: 12px; }
@@ -473,6 +491,10 @@
           <span>瀏覽所有記錄的錯誤題目</span>
         </span>
       </button>
+    </div>
+    <div class="transfer-row">
+      <button class="transfer-btn" onclick="exportData()">📤 匯出資料</button>
+      <button class="transfer-btn" onclick="importData()">📥 匯入資料</button>
     </div>
   </div>
 </div>
@@ -1873,7 +1895,6 @@ function startQuiz(mode) {
     if (ids.length === 0) { alert('目前沒有錯題！請先做隨機練習。'); return; }
     const wrongQs = ids.map(id => QUESTIONS.find(q => q.id === id)).filter(Boolean);
     if (wrongQs.length === 0) { alert('錯題資料無法比對，請清除錯題庫後重新練習。'); return; }
-    alert(`DEBUG: wrongBank=${ids.length}題, matched=${wrongQs.length}題`);
     pool = shuffle(wrongQs).slice(0, 50);
   } else {
     pool = shuffle(QUESTIONS).slice(0, 50);
@@ -2081,6 +2102,45 @@ window.showScreen = function(id) {
   origShowScreen(id);
   if (id === 'screen-bank') renderBank();
 };
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT / IMPORT
+// ═══════════════════════════════════════════════════════════
+function exportData() {
+  const json = JSON.stringify(state);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '微生物考題備份.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const parsed = JSON.parse(ev.target.result);
+        state = { ...state, ...parsed };
+        saveState();
+        updateTopbar();
+        updateHome();
+        alert('✅ 匯入成功！錯題庫已還原。');
+      } catch(err) {
+        alert('❌ 檔案格式錯誤，無法匯入。');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
 
 // Debug: tap title 5x to show localStorage keys
 let _dbgTap = 0, _dbgTimer;
