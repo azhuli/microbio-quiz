@@ -1895,6 +1895,7 @@ function startQuiz(mode) {
     const ids = Object.keys(state.wrongBank);
     if (ids.length === 0) { alert('目前沒有錯題！請先做隨機練習。'); return; }
     const wrongQs = ids.map(id => QUESTIONS.find(q => q.id === id)).filter(Boolean);
+    alert('matched:' + wrongQs.length + ' ids[0]:' + ids[0] + ' found:' + !!QUESTIONS.find(q => q.id === ids[0]));
     if (wrongQs.length === 0) { alert('錯題資料無法比對，請清除錯題庫後重新練習。'); return; }
     pool = shuffle(wrongQs).slice(0, 50);
   } else {
