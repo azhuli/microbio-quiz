@@ -406,7 +406,7 @@
 
 <!-- TOP BAR -->
 <div class="topbar">
-  <div class="topbar-title">
+  <div class="topbar-title" id="topbar-title-debug">
     🧫 微生物考題練習
     <span class="badge">TTQAS 2014–2025</span>
   </div>
@@ -1799,7 +1799,7 @@ let quiz = {
 // ═══════════════════════════════════════════════════════════
 // STORAGE
 // ═══════════════════════════════════════════════════════════
-const SK = 'microbio_state_v5';
+const SK = 'microbio_state';
 let _storageOk = false;
 try { localStorage.setItem('__test__','1'); localStorage.removeItem('__test__'); _storageOk = true; } catch(e){}
 function saveState() {
@@ -1872,6 +1872,7 @@ function startQuiz(mode) {
     const ids = Object.keys(state.wrongBank);
     if (ids.length === 0) { alert('目前沒有錯題！請先做隨機練習。'); return; }
     const wrongQs = ids.map(id => QUESTIONS.find(q => q.id === id)).filter(Boolean);
+    if (wrongQs.length === 0) { alert('錯題資料無法比對，請清除錯題庫後重新練習。'); return; }
     pool = shuffle(wrongQs).slice(0, 50);
   } else {
     pool = shuffle(QUESTIONS).slice(0, 50);
@@ -2080,7 +2081,19 @@ window.showScreen = function(id) {
   if (id === 'screen-bank') renderBank();
 };
 
-// icon handled by static apple-touch-icon.png
+// Debug: tap title 5x to show localStorage keys
+let _dbgTap = 0, _dbgTimer;
+document.getElementById('topbar-title-debug').addEventListener('click', () => {
+  _dbgTap++;
+  clearTimeout(_dbgTimer);
+  _dbgTimer = setTimeout(() => { _dbgTap = 0; }, 1500);
+  if (_dbgTap >= 5) {
+    _dbgTap = 0;
+    const keys = Object.keys(localStorage);
+    alert('localStorage keys:\n' + (keys.length ? keys.join('\n') : '（空）'));
+  }
+});
+
 </script>
 </body>
 </html>
