@@ -477,7 +477,7 @@
           <span>從所有題目隨機抽取，每次不同組合</span>
         </span>
       </button>
-      <button class="mode-btn warn-btn" onclick="alert('按到了'); startQuiz('wrong')" id="wrong-mode-btn">
+      <button class="mode-btn warn-btn" onclick="alert('wrongBank數量:'+Object.keys(state.wrongBank).length+'\n前3個key:'+Object.keys(state.wrongBank).slice(0,3).join(',')); startQuiz('wrong')" id="wrong-mode-btn">
         <span class="mode-icon">🔁</span>
         <span class="mode-text">
           <strong>錯題複習</strong>
