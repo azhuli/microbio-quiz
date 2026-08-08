@@ -1873,6 +1873,7 @@ function startQuiz(mode) {
     if (ids.length === 0) { alert('目前沒有錯題！請先做隨機練習。'); return; }
     const wrongQs = ids.map(id => QUESTIONS.find(q => q.id === id)).filter(Boolean);
     if (wrongQs.length === 0) { alert('錯題資料無法比對，請清除錯題庫後重新練習。'); return; }
+    alert(`DEBUG: wrongBank=${ids.length}題, matched=${wrongQs.length}題`);
     pool = shuffle(wrongQs).slice(0, 50);
   } else {
     pool = shuffle(QUESTIONS).slice(0, 50);
