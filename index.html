@@ -477,7 +477,7 @@
           <span>從所有題目隨機抽取，每次不同組合</span>
         </span>
       </button>
-      <button class="mode-btn warn-btn" onclick="alert('wrongBank數量:'+Object.keys(state.wrongBank).length+'\n前3個key:'+Object.keys(state.wrongBank).slice(0,3).join(',')); startQuiz('wrong')" id="wrong-mode-btn">
+      <button class="mode-btn warn-btn" onclick="startQuiz('wrong')" id="wrong-mode-btn">
         <span class="mode-icon">🔁</span>
         <span class="mode-text">
           <strong>錯題複習</strong>
@@ -773,7 +773,7 @@ const QUESTIONS = [
   { id:'2015-098', year:2015, q:'高壓蒸汽滅菌不能完全的原因，如下敘述中，何者錯誤？', opts:['超載，滅菌物品包放置太多','沒有將冷空氣填充於高壓滅菌器內','由於急用未按正確方法使用，導致滅菌時間不足','包裝過緊影響蒸汽流動','沒有嚴格遵守操作規範，平常沒有維修良好'], ans:'B' },
   { id:'2015-099', year:2015, q:'食品中毒/媒介常見病原菌中，可引起腸道外(Extraintestinal)感染的病原菌為何？', opts:['金黃色葡萄球菌(Staph. aureus)、仙人掌桿菌、肉毒桿菌','產氣莢膜梭狀桿菌(Clostridium perfringens)','彎曲桿菌、志賀氏菌、霍亂弧菌O1','布魯斯菌(Brucella)、李斯特菌、傷寒沙門氏菌','腸炎耶爾辛氏菌(Yersinia enterocolitica)、大腸桿菌-VTEC'], ans:'D' },
   { id:'2015-100', year:2015, q:'若以TaqMan(Probe)螢光的方式進行Real-time PCR而欲檢驗不同標的項目，其除了更換樣品DNA外只需要再更換：', opts:['聚合酶濃度','引子/探針','水的比例','鎂離子濃度','不同實驗機型'], ans:'B' },
-,
+
   // ── 2016 A卷 ──
   { id:'2016-001', year:2016, q:'如下食品中毒病原毒菌，哪兩種為嗜冷菌？(1)金黃色葡萄球菌 (2)李斯特菌 (3)彎曲桿菌 (4)氣單胞菌 (5)鄰單胞菌 (6)耶辛尼氏腸炎桿菌', opts:['1及2','2及3','3及4','5及6','2及6'], ans:'E' },
   { id:'2016-002', year:2016, q:'欲檢測食品中毒相關的耶辛尼氏腸炎桿菌應該使用何種培養基？', opts:['馬康奇及Cefsulodin-ingasan novobiocin agar(CIN)培養基','澱粉酚紅安匹西林培養基(SPA)及TSA培養基','精胺酸葡萄糖培養基(AGS)及TCBS培養基','紫紅膽鹽葡萄糖培養基(VRBG)及阪崎腸桿菌培養基(ESA)','CIN培養基及紅安匹西林培養基(SPA)'], ans:'A' },
@@ -1840,10 +1840,10 @@ function loadState() {
 // UI HELPERS
 // ═══════════════════════════════════════════════════════════
 function showScreen(id) {
-  alert('showScreen:' + id);
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
+  if (id === 'screen-bank') renderBank();
 }
 
 function updateTopbar() {
@@ -1895,7 +1895,6 @@ function startQuiz(mode) {
     const ids = Object.keys(state.wrongBank);
     if (ids.length === 0) { alert('目前沒有錯題！請先做隨機練習。'); return; }
     const wrongQs = ids.map(id => QUESTIONS.find(q => q.id === id)).filter(Boolean);
-    alert('matched:' + wrongQs.length + ' ids[0]:' + ids[0] + ' found:' + !!QUESTIONS.find(q => q.id === ids[0]));
     if (wrongQs.length === 0) { alert('錯題資料無法比對，請清除錯題庫後重新練習。'); return; }
     pool = shuffle(wrongQs).slice(0, 50);
   } else {
@@ -2099,11 +2098,6 @@ updateHome();
 
 // Re-render bank when shown
 document.getElementById('screen-bank').addEventListener('transitionend', renderBank);
-const origShowScreen = showScreen;
-window.showScreen = function(id) {
-  origShowScreen(id);
-  if (id === 'screen-bank') renderBank();
-};
 
 // ═══════════════════════════════════════════════════════════
 // EXPORT / IMPORT
