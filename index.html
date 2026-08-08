@@ -1978,15 +1978,22 @@ function handleAnswer(chosen, btn) {
   // Next btn
   const nextBtn = document.getElementById('next-btn');
   nextBtn.classList.add('show');
-  nextBtn.textContent = quiz.current < quiz.questions.length - 1 ? '下一題 →' : '查看結果';
+  const isLast = quiz.current >= quiz.questions.length - 1;
+  nextBtn.textContent = isLast ? '查看結果' : '下一題 →';
+  nextBtn.onclick = isLast ? showResult : nextQuestion;
 }
 
 function nextQuestion() {
-  if (quiz.current < quiz.questions.length - 1) {
-    quiz.current++;
-    renderQuestion();
-  } else {
-    showResult();
+  try {
+    if (quiz.current < quiz.questions.length - 1) {
+      quiz.current++;
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  } catch(e) {
+    console.error('nextQuestion error:', e);
+    try { showScreen('screen-result'); } catch(e2) {}
   }
 }
 
@@ -2019,22 +2026,29 @@ function showResult() {
     wl.innerHTML = '';
   } else {
     const keys = ['A','B','C','D','E'];
-    wl.innerHTML = `
-      <div class="wrong-review-header">✗ 本次答錯 ${wrongs.length} 題</div>
-      ${wrongs.map(a => {
-        const optIdx = keys.indexOf(a.correct_ans);
-        const correctText = a.opts && optIdx >= 0 ? a.opts[optIdx] : a.correct_ans;
-        const chosenIdx = keys.indexOf(a.chosen);
-        const chosenText = a.opts && chosenIdx >= 0 ? a.opts[chosenIdx] : a.chosen;
-        return `<div class="wrong-item">
-          <div class="wi-q">${a.q.length > 60 ? a.q.slice(0,60)+'…' : a.q}</div>
-          <div class="wi-ans">
-            <span class="wi-yours">你的答案: ${a.chosen} ${chosenText.length > 20 ? chosenText.slice(0,20)+'…' : chosenText}</span>
-            <span class="wi-correct">✓ 正確: ${a.correct_ans} ${correctText.length > 20 ? correctText.slice(0,20)+'…' : correctText}</span>
-          </div>
-        </div>`;
-      }).join('')}
-    `;
+    try {
+      wl.innerHTML = `
+        <div class="wrong-review-header">✗ 本次答錯 ${wrongs.length} 題</div>
+        ${wrongs.map(a => {
+          const optIdx = keys.indexOf(a.correct_ans);
+          const correctText = (a.opts && optIdx >= 0 && a.opts[optIdx]) ? a.opts[optIdx] : (a.correct_ans || '');
+          const chosenIdx = keys.indexOf(a.chosen);
+          const chosenText = (a.opts && chosenIdx >= 0 && a.opts[chosenIdx]) ? a.opts[chosenIdx] : (a.chosen || '');
+          const qText = (a.q || '').length > 60 ? (a.q || '').slice(0,60)+'…' : (a.q || '');
+          const ct = correctText.length > 20 ? correctText.slice(0,20)+'…' : correctText;
+          const cht = chosenText.length > 20 ? chosenText.slice(0,20)+'…' : chosenText;
+          return `<div class="wrong-item">
+            <div class="wi-q">${qText}</div>
+            <div class="wi-ans">
+              <span class="wi-yours">你的答案: ${a.chosen || '?'} ${cht}</span>
+              <span class="wi-correct">✓ 正確: ${a.correct_ans || '?'} ${ct}</span>
+            </div>
+          </div>`;
+        }).join('')}
+      `;
+    } catch(e) {
+      wl.innerHTML = `<div class="wrong-review-header">✗ 本次答錯 ${wrongs.length} 題（詳細顯示發生錯誤）</div>`;
+    }
   }
 
   const retryBtn = document.getElementById('res-retry-wrong');
