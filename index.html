@@ -3,7 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>微生物考題練習系統 (2014–2024)</title>
+<title>微生物考題練習系統 (2014–2025)</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="微生物考題">
+<meta name="theme-color" content="#8B6848">
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22%E5%BE%AE%E7%94%9F%E7%89%A9%E8%80%83%E9%A1%8C%E7%B7%B4%E7%BF%92%E7%B3%BB%E7%B5%B1%22%2C%22short_name%22%3A%22%E5%BE%AE%E7%94%9F%E7%89%A9%E8%80%83%E9%A1%8C%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23F5F0E8%22%2C%22theme_color%22%3A%22%238B6848%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48cmVjdCB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgcng9IjM4IiBmaWxsPSIjOEI2ODQ4Ii8+PGVsbGlwc2UgY3g9Ijk2IiBjeT0iMTEwIiByeD0iNTIiIHJ5PSIzMiIgZmlsbD0iI0Q0QzRBOCIvPjxlbGxpcHNlIGN4PSI5NiIgY3k9IjExMCIgcng9IjQ0IiByeT0iMjYiIGZpbGw9IiNGNUYwRTgiLz48ZWxsaXBzZSBjeD0iNzgiIGN5PSIxMDgiIHJ4PSIxNCIgcnk9IjEwIiBmaWxsPSIjQTA3ODMwIiBvcGFjaXR5PSIwLjYiLz48ZWxsaXBzZSBjeD0iMTEyIiBjeT0iMTE0IiByeD0iMTAiIHJ5PSI3IiBmaWxsPSIjNUE3QTNBIiBvcGFjaXR5PSIwLjciLz48ZWxsaXBzZSBjeD0iOTYiIGN5PSIxMDQiIHJ4PSI3IiByeT0iNSIgZmlsbD0iI0MwNDAwMCIgb3BhY2l0eT0iMC44Ii8+PHJlY3QgeD0iODQiIHk9IjUwIiB3aWR0aD0iMjQiIGhlaWdodD0iNjIiIHJ4PSI1IiBmaWxsPSIjRDRDNEE4Ii8+PHJlY3QgeD0iODgiIHk9IjQ2IiB3aWR0aD0iMTYiIGhlaWdodD0iMTAiIHJ4PSIzIiBmaWxsPSIjQjBBMDg4Ii8+PC9zdmc+%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjOEI2ODQ4Ii8+PCEtLSBwZXRyaSBkaXNoIC0tPjxlbGxpcHNlIGN4PSI5MCIgY3k9IjEwNCIgcng9IjU0IiByeT0iMzQiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI0Q0QzRBOCIgc3Ryb2tlLXdpZHRoPSI1Ii8+PGVsbGlwc2UgY3g9IjkwIiBjeT0iMTA0IiByeD0iNDgiIHJ5PSIyOCIgZmlsbD0iI0Y1RjBFOCIvPjwhLS0gY29sb25pZXMgLS0+PGNpcmNsZSBjeD0iNzIiIGN5PSIxMDIiIHI9IjEyIiBmaWxsPSIjQTA3ODMwIiBvcGFjaXR5PSIwLjciLz48Y2lyY2xlIGN4PSIxMDgiIGN5PSIxMDgiIHI9IjkiIGZpbGw9IiM1QTdBM0EiIG9wYWNpdHk9IjAuOCIvPjxjaXJjbGUgY3g9IjkwIiBjeT0iOTgiIHI9IjciIGZpbGw9IiNDMDQwMDAiIG9wYWNpdHk9IjAuOCIvPjxjaXJjbGUgY3g9Ijc4IiBjeT0iMTE1IiByPSI1IiBmaWxsPSIjOEI2ODQ4IiBvcGFjaXR5PSIwLjUiLz48Y2lyY2xlIGN4PSIxMDMiIGN5PSI5NiIgcj0iNSIgZmlsbD0iI0EwNzgzMCIgb3BhY2l0eT0iMC42Ii8+PCEtLSBsaWQgaGFuZGxlIC0tPjxsaW5lIHgxPSI5MCIgeTE9IjcwIiB4Mj0iOTAiIHkyPSI0OCIgc3Ryb2tlPSIjRDRDNEE4IiBzdHJva2Utd2lkdGg9IjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxjaXJjbGUgY3g9IjkwIiBjeT0iNDQiIHI9IjgiIGZpbGw9IiNCMEEwODgiLz48L3N2Zz4=">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap');
 
@@ -11,8 +18,8 @@
     --bg: #F5F0E8;
     --surface: #FDFAF5;
     --surface-2: #EDE5D8;
-    --primary: #6B4C2A;
-    --primary-light: #8B6340;
+    --primary: #8B6848;
+    --primary-light: #A67D5A;
     --accent: #5A7A3A;
     --danger: #9B3A2A;
     --warn: #B07030;
@@ -150,7 +157,7 @@
     overflow: hidden;
   }
   .quiz-progress-fill {
-    background: linear-gradient(90deg, var(--primary), #8B6340);
+    background: linear-gradient(90deg, var(--primary), #A67D5A);
     height: 100%;
     border-radius: 99px;
     transition: width 0.4s ease;
@@ -387,7 +394,7 @@
 <div class="topbar">
   <div class="topbar-title">
     🧫 微生物考題練習
-    <span class="badge">TTQAS 2014–2024</span>
+    <span class="badge">TTQAS 2014–2025</span>
   </div>
   <div class="topbar-stats">
     <div class="stat-item">
@@ -2050,6 +2057,58 @@ window.showScreen = function(id) {
   origShowScreen(id);
   if (id === 'screen-bank') renderBank();
 };
+
+// Generate PWA icon via canvas and inject as apple-touch-icon
+(function() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 180;
+  const ctx = c.getContext('2d');
+  // Background rounded rect
+  ctx.beginPath();
+  const r = 40, w = 180, h = 180;
+  ctx.moveTo(r, 0); ctx.lineTo(w-r, 0); ctx.quadraticCurveTo(w, 0, w, r);
+  ctx.lineTo(w, h-r); ctx.quadraticCurveTo(w, h, w-r, h);
+  ctx.lineTo(r, h); ctx.quadraticCurveTo(0, h, 0, h-r);
+  ctx.lineTo(0, r); ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+  ctx.fillStyle = '#8B6848'; ctx.fill();
+  // Petri dish outer rim
+  ctx.beginPath(); ctx.ellipse(90, 106, 54, 34, 0, 0, Math.PI*2);
+  ctx.strokeStyle = '#D4C4A8'; ctx.lineWidth = 5; ctx.stroke();
+  // Petri dish agar
+  ctx.beginPath(); ctx.ellipse(90, 106, 48, 28, 0, 0, Math.PI*2);
+  ctx.fillStyle = '#F5F0E8'; ctx.fill();
+  // Colonies
+  const cols = [
+    {x:72, y:102, r:12, c:'#A07830', o:0.75},
+    {x:108, y:110, r:9, c:'#5A7A3A', o:0.85},
+    {x:90, y:98, r:7, c:'#C04000', o:0.85},
+    {x:78, y:116, r:5, c:'#8B6848', o:0.5},
+    {x:103, y:96, r:5, c:'#A07830', o:0.65},
+  ];
+  cols.forEach(({x,y,r,c,o}) => {
+    ctx.globalAlpha = o;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.fillStyle = c; ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+  // Handle stem
+  ctx.beginPath(); ctx.moveTo(90, 72); ctx.lineTo(90, 48);
+  ctx.strokeStyle = '#D4C4A8'; ctx.lineWidth = 8;
+  ctx.lineCap = 'round'; ctx.stroke();
+  // Handle knob
+  ctx.beginPath(); ctx.arc(90, 44, 8, 0, Math.PI*2);
+  ctx.fillStyle = '#B0A088'; ctx.fill();
+
+  const png = c.toDataURL('image/png');
+  // Set apple-touch-icon
+  let link = document.querySelector('link[rel="apple-touch-icon"]');
+  if (link) link.href = png;
+  // Also set favicon
+  let fav = document.createElement('link');
+  fav.rel = 'icon'; fav.type = 'image/png'; fav.href = png;
+  document.head.appendChild(fav);
+})();
 </script>
 </body>
 </html>
