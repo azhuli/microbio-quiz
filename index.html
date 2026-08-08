@@ -2058,53 +2058,28 @@ window.showScreen = function(id) {
   if (id === 'screen-bank') renderBank();
 };
 
-// Generate PWA icon via canvas and inject as apple-touch-icon
+// Generate emoji icon via canvas
 (function() {
   const c = document.createElement('canvas');
   c.width = c.height = 180;
   const ctx = c.getContext('2d');
-  // Background rounded rect
+  // Rounded background
   ctx.beginPath();
   const r = 40, w = 180, h = 180;
-  ctx.moveTo(r, 0); ctx.lineTo(w-r, 0); ctx.quadraticCurveTo(w, 0, w, r);
-  ctx.lineTo(w, h-r); ctx.quadraticCurveTo(w, h, w-r, h);
-  ctx.lineTo(r, h); ctx.quadraticCurveTo(0, h, 0, h-r);
-  ctx.lineTo(0, r); ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.moveTo(r,0); ctx.lineTo(w-r,0); ctx.quadraticCurveTo(w,0,w,r);
+  ctx.lineTo(w,h-r); ctx.quadraticCurveTo(w,h,w-r,h);
+  ctx.lineTo(r,h); ctx.quadraticCurveTo(0,h,0,h-r);
+  ctx.lineTo(0,r); ctx.quadraticCurveTo(0,0,r,0);
   ctx.closePath();
   ctx.fillStyle = '#8B6848'; ctx.fill();
-  // Petri dish outer rim
-  ctx.beginPath(); ctx.ellipse(90, 106, 54, 34, 0, 0, Math.PI*2);
-  ctx.strokeStyle = '#D4C4A8'; ctx.lineWidth = 5; ctx.stroke();
-  // Petri dish agar
-  ctx.beginPath(); ctx.ellipse(90, 106, 48, 28, 0, 0, Math.PI*2);
-  ctx.fillStyle = '#F5F0E8'; ctx.fill();
-  // Colonies
-  const cols = [
-    {x:72, y:102, r:12, c:'#A07830', o:0.75},
-    {x:108, y:110, r:9, c:'#5A7A3A', o:0.85},
-    {x:90, y:98, r:7, c:'#C04000', o:0.85},
-    {x:78, y:116, r:5, c:'#8B6848', o:0.5},
-    {x:103, y:96, r:5, c:'#A07830', o:0.65},
-  ];
-  cols.forEach(({x,y,r,c,o}) => {
-    ctx.globalAlpha = o;
-    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
-    ctx.fillStyle = c; ctx.fill();
-  });
-  ctx.globalAlpha = 1;
-  // Handle stem
-  ctx.beginPath(); ctx.moveTo(90, 72); ctx.lineTo(90, 48);
-  ctx.strokeStyle = '#D4C4A8'; ctx.lineWidth = 8;
-  ctx.lineCap = 'round'; ctx.stroke();
-  // Handle knob
-  ctx.beginPath(); ctx.arc(90, 44, 8, 0, Math.PI*2);
-  ctx.fillStyle = '#B0A088'; ctx.fill();
-
+  // Emoji
+  ctx.font = '110px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('🧫', 90, 95);
   const png = c.toDataURL('image/png');
-  // Set apple-touch-icon
   let link = document.querySelector('link[rel="apple-touch-icon"]');
   if (link) link.href = png;
-  // Also set favicon
   let fav = document.createElement('link');
   fav.rel = 'icon'; fav.type = 'image/png'; fav.href = png;
   document.head.appendChild(fav);
