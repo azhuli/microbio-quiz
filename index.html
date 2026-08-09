@@ -373,9 +373,19 @@
     line-height: 1.55;
     border-left: 4px solid var(--danger);
   }
+  .bank-item { cursor: pointer; }
   .bank-item .bi-q { color: var(--text); margin-bottom: 4px; font-weight: 500; }
   .bank-item .bi-meta { display: flex; gap: 14px; font-size: 0.78rem; color: var(--text-2); margin-top: 4px; }
   .bi-count { color: var(--danger); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+  .bank-item .bi-expand { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .bank-item.open .bi-expand { display: block; }
+  .bank-item .bi-toggle { float: right; font-size: 0.75rem; color: var(--text-2); }
+  .bank-item.open .bi-toggle::after { content: '▲ 收合'; }
+  .bank-item:not(.open) .bi-toggle::after { content: '▼ 展開'; }
+  .bi-opts { list-style: none; padding: 0; margin: 6px 0 8px; font-size: 0.82rem; line-height: 1.7; }
+  .bi-opts li { padding: 2px 0; }
+  .bi-opts li.bi-correct-opt { color: var(--accent); font-weight: 700; }
+  .bi-opts li.bi-wrong-opt { color: var(--danger); text-decoration: line-through; }
   .bank-clear-btn {
     background: #F5E8E4;
     color: var(--danger);
@@ -1965,6 +1975,7 @@ function handleAnswer(chosen, btn) {
     }
     state.wrongBank[q.id].count++;
     state.wrongBank[q.id].lastWrong = new Date().toLocaleDateString('zh-TW');
+    state.wrongBank[q.id].lastChosen = chosen;
   }
 
   quiz.answers.push({ qid: q.id, correct: isCorrect, chosen, correct_ans: correct, q: q.q, opts: q.opts });
@@ -2080,14 +2091,30 @@ function renderBank() {
 
   content.innerHTML = `
     <button class="bank-clear-btn" onclick="clearBank()">🗑 清除所有錯題記錄</button>
-    ${sorted.map(id => {
+    ${sorted.map((id, idx) => {
       const item = state.wrongBank[id];
-      return `<div class="bank-item">
-        <div class="bi-q">${item.q.length > 80 ? item.q.slice(0,80)+'…' : item.q}</div>
+      // Find full question data for options
+      const qData = QUESTIONS.find(q => q.id === id);
+      const keys = ['A','B','C','D','E'];
+      let optsHtml = '';
+      if (qData && qData.opts) {
+        optsHtml = `<ul class="bi-opts">${qData.opts.map((opt, i) => {
+          const letter = keys[i];
+          const isCorrect = letter === item.ans;
+          const isWrong = item.lastChosen && letter === item.lastChosen && !isCorrect;
+          return `<li class="${isCorrect ? 'bi-correct-opt' : (isWrong ? 'bi-wrong-opt' : '')}">${letter}. ${opt}</li>`;
+        }).join('')}</ul>`;
+      }
+      return `<div class="bank-item" onclick="this.classList.toggle('open')">
+        <span class="bi-toggle"></span>
+        <div class="bi-q">${item.q}</div>
         <div class="bi-meta">
           <span class="bi-count">錯 ${item.count} 次</span>
           <span>最近: ${item.lastWrong || '—'}</span>
           <span>正解: ${item.ans}</span>
+        </div>
+        <div class="bi-expand">
+          ${optsHtml}
         </div>
       </div>`;
     }).join('')}
