@@ -366,16 +366,42 @@
   .bank-item {
     background: var(--surface);
     border-radius: 10px;
-    padding: 14px 16px;
     margin-bottom: 10px;
     box-shadow: 0 1px 6px rgba(0,0,0,0.07);
     font-size: 0.84rem;
     line-height: 1.55;
     border-left: 4px solid var(--danger);
+    overflow: hidden;
+    cursor: pointer;
   }
-  .bank-item .bi-q { color: var(--text); margin-bottom: 4px; font-weight: 500; }
-  .bank-item .bi-meta { display: flex; gap: 14px; font-size: 0.78rem; color: var(--text-2); margin-top: 4px; }
+  .bank-item.mastered { border-left-color: var(--accent); opacity: 0.62; }
+  .bank-item-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .bank-item-header .bi-expand { font-size: 0.8rem; color: var(--text-2); flex-shrink: 0; margin-top: 2px; transition: transform 0.2s; }
+  .bank-item.open .bi-expand { transform: rotate(90deg); }
+  .bank-item .bi-q { color: var(--text); font-weight: 500; flex: 1; }
+  .bank-item .bi-meta { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 0.78rem; color: var(--text-2); margin-top: 5px; }
   .bi-count { color: var(--danger); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+  .bank-item-detail {
+    display: none;
+    padding: 0 16px 14px 16px;
+    border-top: 1px solid var(--border);
+    margin-top: 0;
+  }
+  .bank-item.open .bank-item-detail { display: block; }
+  .bi-opt {
+    padding: 6px 10px;
+    margin: 4px 0;
+    border-radius: 7px;
+    font-size: 0.82rem;
+    background: var(--surface-2);
+  }
+  .bi-opt.correct-opt { background: #E6F4E0; color: #2A6020; font-weight: 600; }
+  .bi-opt.wrong-opt { background: #FAE8E4; color: var(--danger); text-decoration: line-through; }
   .bank-clear-btn {
     background: #F5E8E4;
     color: var(--danger);
@@ -1992,6 +2018,7 @@ function handleAnswer(chosen, btn) {
     }
     state.wrongBank[q.id].count++;
     state.wrongBank[q.id].lastWrong = new Date().toLocaleDateString('zh-TW');
+    state.wrongBank[q.id].lastChosen = chosen;
     state.wrongBank[q.id].consecutiveCorrect = 0; // reset on wrong
     state.wrongBank[q.id].mastered = false;
   }
@@ -2115,29 +2142,62 @@ function renderBank() {
   const masteredCount = ids.filter(id => state.wrongBank[id].mastered).length;
   const activeCount = ids.length - masteredCount;
 
+  // Build HTML — opts come from QUESTIONS lookup
+  const cards = sorted.map(id => {
+    const item = state.wrongBank[id];
+    const qObj = QUESTIONS.find(q => q.id === id);
+    const cc = item.consecutiveCorrect || 0;
+    const isMastered = item.mastered || false;
+
+    const progressTag = isMastered
+      ? `<span style="color:var(--accent);font-weight:600;">🎓 已掌握</span>`
+      : cc > 0
+        ? `<span style="color:var(--warn);">連續答對 ${cc}/5</span>`
+        : '';
+
+    let optsHtml = '';
+    if (qObj && qObj.opts) {
+      const letters = ['A','B','C','D','E','F'];
+      optsHtml = qObj.opts.map((opt, i) => {
+        const letter = letters[i];
+        const isCorrect = letter === item.ans;
+        const isLastWrong = letter === item.lastChosen;
+        let cls = 'bi-opt';
+        if (isCorrect) cls += ' correct-opt';
+        else if (isLastWrong) cls += ' wrong-opt';
+        return `<div class="${cls}">${letter}. ${opt}</div>`;
+      }).join('');
+    } else {
+      optsHtml = `<div style="color:var(--text-2);font-size:0.8rem;">（選項資料不可用）正確答案：${item.ans}</div>`;
+    }
+
+    return `<div class="bank-item${isMastered ? ' mastered' : ''}" onclick="toggleBankItem(this)">
+      <div class="bank-item-header">
+        <span class="bi-expand">▶</span>
+        <div style="flex:1">
+          <div class="bi-q">${item.q}</div>
+          <div class="bi-meta">
+            <span class="bi-count">錯 ${item.count} 次</span>
+            <span>最近: ${item.lastWrong || '—'}</span>
+            ${progressTag}
+          </div>
+        </div>
+      </div>
+      <div class="bank-item-detail">
+        ${optsHtml}
+      </div>
+    </div>`;
+  }).join('');
+
   content.innerHTML = `
     <button class="bank-clear-btn" onclick="clearBank()">🗑 清除所有錯題記錄</button>
     ${masteredCount > 0 ? `<div style="font-size:0.82rem;color:var(--accent);margin-bottom:10px;padding:6px 10px;background:rgba(90,122,58,0.08);border-radius:8px;">🎓 已掌握 ${masteredCount} 題（連續答對5次，出現機率降低）　待加強 ${activeCount} 題</div>` : ''}
-    ${sorted.map(id => {
-      const item = state.wrongBank[id];
-      const cc = item.consecutiveCorrect || 0;
-      const isMastered = item.mastered || false;
-      const progressBar = isMastered
-        ? `<span style="color:var(--accent);font-weight:600;">🎓 已掌握</span>`
-        : cc > 0
-          ? `<span style="color:var(--warn);">連續答對 ${cc}/5</span>`
-          : '';
-      return `<div class="bank-item" style="${isMastered ? 'opacity:0.55;' : ''}">
-        <div class="bi-q">${item.q.length > 80 ? item.q.slice(0,80)+'…' : item.q}</div>
-        <div class="bi-meta">
-          <span class="bi-count">錯 ${item.count} 次</span>
-          <span>最近: ${item.lastWrong || '—'}</span>
-          <span>正解: ${item.ans}</span>
-          ${progressBar}
-        </div>
-      </div>`;
-    }).join('')}
+    ${cards}
   `;
+}
+
+function toggleBankItem(el) {
+  el.classList.toggle('open');
 }
 
 function clearBank() {
