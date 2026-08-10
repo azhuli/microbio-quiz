@@ -373,19 +373,9 @@
     line-height: 1.55;
     border-left: 4px solid var(--danger);
   }
-  .bank-item { cursor: pointer; }
   .bank-item .bi-q { color: var(--text); margin-bottom: 4px; font-weight: 500; }
   .bank-item .bi-meta { display: flex; gap: 14px; font-size: 0.78rem; color: var(--text-2); margin-top: 4px; }
   .bi-count { color: var(--danger); font-weight: 600; font-family: 'JetBrains Mono', monospace; }
-  .bank-item .bi-expand { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
-  .bank-item.open .bi-expand { display: block; }
-  .bank-item .bi-toggle { float: right; font-size: 0.75rem; color: var(--text-2); }
-  .bank-item.open .bi-toggle::after { content: '▲ 收合'; }
-  .bank-item:not(.open) .bi-toggle::after { content: '▼ 展開'; }
-  .bi-opts { list-style: none; padding: 0; margin: 6px 0 8px; font-size: 0.82rem; line-height: 1.7; }
-  .bi-opts li { padding: 2px 0; }
-  .bi-opts li.bi-correct-opt { color: var(--accent); font-weight: 700; }
-  .bi-opts li.bi-wrong-opt { color: var(--danger); text-decoration: line-through; }
   .bank-clear-btn {
     background: #F5E8E4;
     color: var(--danger);
@@ -1818,7 +1808,7 @@ let state = {
   totalAnswered: 0,
   totalCorrect: 0,
   sessions: 0,
-  wrongBank: {},   // { qid: { count, lastWrong, q } }
+  wrongBank: {},   // { qid: { count, lastWrong, q, consecutiveCorrect, mastered } }
 };
 
 let quiz = {
@@ -1906,7 +1896,20 @@ function startQuiz(mode) {
     if (ids.length === 0) { alert('目前沒有錯題！請先做隨機練習。'); return; }
     const wrongQs = ids.map(id => QUESTIONS.find(q => q.id === id)).filter(Boolean);
     if (wrongQs.length === 0) { alert('錯題資料無法比對，請清除錯題庫後重新練習。'); return; }
-    pool = shuffle(wrongQs).slice(0, 50);
+    // Mastered questions (consecutiveCorrect >= 5) appear with 1/5 probability
+    const weighted = [];
+    wrongQs.forEach(q => {
+      const entry = state.wrongBank[q.id];
+      const isMastered = entry && entry.consecutiveCorrect >= 5;
+      if (!isMastered) {
+        weighted.push(q); // normal weight
+      } else if (Math.random() < 0.2) {
+        weighted.push(q); // 1/5 chance for mastered
+      }
+    });
+    // Fallback: if all mastered and weighted is empty, include all
+    const finalPool = weighted.length > 0 ? weighted : wrongQs;
+    pool = shuffle(finalPool).slice(0, 50);
   } else {
     pool = shuffle(QUESTIONS).slice(0, 50);
   }
@@ -1963,19 +1966,34 @@ function handleAnswer(chosen, btn) {
   // Feedback
   const fb = document.getElementById('q-feedback');
   if (isCorrect) {
-    fb.className = 'feedback-box correct-fb show';
-    fb.textContent = '✓ 正確！';
+    // Update consecutiveCorrect if this question is in wrongBank
+    if (state.wrongBank[q.id]) {
+      state.wrongBank[q.id].consecutiveCorrect = (state.wrongBank[q.id].consecutiveCorrect || 0) + 1;
+      const cc = state.wrongBank[q.id].consecutiveCorrect;
+      if (cc >= 5) {
+        state.wrongBank[q.id].mastered = true;
+        fb.className = 'feedback-box correct-fb show';
+        fb.textContent = '✓ 正確！🎓 已連續答對5次，此題出現機率降低！';
+      } else {
+        fb.className = 'feedback-box correct-fb show';
+        fb.textContent = `✓ 正確！（連續答對 ${cc}/5 次）`;
+      }
+    } else {
+      fb.className = 'feedback-box correct-fb show';
+      fb.textContent = '✓ 正確！';
+    }
   } else {
     fb.className = 'feedback-box wrong-fb show';
     fb.textContent = `✗ 錯誤。正確答案是 ${correct}`;
     quiz.wrongInSession++;
     // Add to wrong bank
     if (!state.wrongBank[q.id]) {
-      state.wrongBank[q.id] = { count: 0, q: q.q, ans: q.ans };
+      state.wrongBank[q.id] = { count: 0, q: q.q, ans: q.ans, consecutiveCorrect: 0 };
     }
     state.wrongBank[q.id].count++;
     state.wrongBank[q.id].lastWrong = new Date().toLocaleDateString('zh-TW');
-    state.wrongBank[q.id].lastChosen = chosen;
+    state.wrongBank[q.id].consecutiveCorrect = 0; // reset on wrong
+    state.wrongBank[q.id].mastered = false;
   }
 
   quiz.answers.push({ qid: q.id, correct: isCorrect, chosen, correct_ans: correct, q: q.q, opts: q.opts });
@@ -2086,35 +2104,36 @@ function renderBank() {
     return;
   }
 
-  // Sort by error count desc
-  const sorted = ids.sort((a,b) => state.wrongBank[b].count - state.wrongBank[a].count);
+  // Sort: non-mastered by error count desc, mastered at bottom
+  const sorted = ids.sort((a,b) => {
+    const ma = state.wrongBank[a].mastered || false;
+    const mb = state.wrongBank[b].mastered || false;
+    if (ma !== mb) return ma ? 1 : -1;
+    return state.wrongBank[b].count - state.wrongBank[a].count;
+  });
+
+  const masteredCount = ids.filter(id => state.wrongBank[id].mastered).length;
+  const activeCount = ids.length - masteredCount;
 
   content.innerHTML = `
     <button class="bank-clear-btn" onclick="clearBank()">🗑 清除所有錯題記錄</button>
-    ${sorted.map((id, idx) => {
+    ${masteredCount > 0 ? `<div style="font-size:0.82rem;color:var(--accent);margin-bottom:10px;padding:6px 10px;background:rgba(90,122,58,0.08);border-radius:8px;">🎓 已掌握 ${masteredCount} 題（連續答對5次，出現機率降低）　待加強 ${activeCount} 題</div>` : ''}
+    ${sorted.map(id => {
       const item = state.wrongBank[id];
-      // Find full question data for options
-      const qData = QUESTIONS.find(q => q.id === id);
-      const keys = ['A','B','C','D','E'];
-      let optsHtml = '';
-      if (qData && qData.opts) {
-        optsHtml = `<ul class="bi-opts">${qData.opts.map((opt, i) => {
-          const letter = keys[i];
-          const isCorrect = letter === item.ans;
-          const isWrong = item.lastChosen && letter === item.lastChosen && !isCorrect;
-          return `<li class="${isCorrect ? 'bi-correct-opt' : (isWrong ? 'bi-wrong-opt' : '')}">${letter}. ${opt}</li>`;
-        }).join('')}</ul>`;
-      }
-      return `<div class="bank-item" onclick="this.classList.toggle('open')">
-        <span class="bi-toggle"></span>
-        <div class="bi-q">${item.q}</div>
+      const cc = item.consecutiveCorrect || 0;
+      const isMastered = item.mastered || false;
+      const progressBar = isMastered
+        ? `<span style="color:var(--accent);font-weight:600;">🎓 已掌握</span>`
+        : cc > 0
+          ? `<span style="color:var(--warn);">連續答對 ${cc}/5</span>`
+          : '';
+      return `<div class="bank-item" style="${isMastered ? 'opacity:0.55;' : ''}">
+        <div class="bi-q">${item.q.length > 80 ? item.q.slice(0,80)+'…' : item.q}</div>
         <div class="bi-meta">
           <span class="bi-count">錯 ${item.count} 次</span>
           <span>最近: ${item.lastWrong || '—'}</span>
           <span>正解: ${item.ans}</span>
-        </div>
-        <div class="bi-expand">
-          ${optsHtml}
+          ${progressBar}
         </div>
       </div>`;
     }).join('')}
