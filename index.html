@@ -832,7 +832,7 @@ const QUESTIONS = [
   { id:'2016-045', year:2016, q:'臭氧是一種強氧化劑，其滅菌原理可包括如下，但何者除外？', opts:['臭氧能氧化分解細菌內部葡萄糖所需的酶，使細菌滅活死亡','直接與細菌、病毒作用，破壞它們的細胞器和DNA、RNA','使微生物產生凝固作用或脫水作用','透過細胞膜，作用於外膜的脂蛋白，使細菌發生通透性畸變而溶解死亡','透過細胞膜，作用於外膜內部的脂多糖，使細菌發生通透性改變而溶解死亡'], ans:'C' },
   { id:'2016-046', year:2016, q:'食品衛生指標及病原菌檢驗，檢體如為冷凍食品，其解凍方式可選擇？(1)放在2~5℃冷藏溫度解凍18小時；(2)放在55℃水浴中15分鐘；(3)放在70℃水浴中5分鐘；(4)放在45℃水浴中15分鐘；(5)放在35℃水浴中45分鐘', opts:['1,3','2,4','3,5','1,4','1,5'], ans:'D' },
   { id:'2016-047', year:2016, q:'分離培養基上的菌落懷疑為沙門氏菌，將其接種TSI agar，若結果斜面為紅色，基底為黑色，瓊脂有崩裂現象，其代表何種反應？(1)不能利用葡萄糖；(2)不能利用乳糖和蔗糖；(3)可產生硫化氫；(4)可產氣；(5)可羧化賴氨酸；(6)不能利用果糖；(7)不能利用所有碳水化合物', opts:['1,2,3','2,3,4','3,4,5','4,5,6','1,6,7'], ans:'B' },
-  { id:'2016-048', year:2016, q:'將革蘭氏陰性菌接種生化八管，其中有關SIM試驗的敘述何者正確？(1)先判讀indole，接著運動性，最後IPA；(2)全管混濁為運動性陽性；(3)培養基上層有棕色環為IPA陽性；(4)SIM的接種為利用接種環插入2/3深度；(5)應先加入IND-A六滴及IND-B兩滴才能判讀indole；(6)加入indole試劑後呈棕色為陽性', opts:['1,2','2,3','3,4','4,5','1,6'], ans:'B' },
+  { id:'2016-048', year:2016, q:'將革蘭氏陰性菌接種生化八管，其中有關SIM試驗的敘述何者正確？(1)先判讀indole，接著運動性，最後IPA；(2)全管混濁為運動性陽性；(3)培養基上層有棕色環為IPA陽性；(4)SIM的接種為利用接種環插入2/3深度；(5)應先加入IND-A六滴及IND-B兩滴才能判讀indole；(6)加入indole試劑後呈棕色為陽性', opts:['1,2','2,3','3,4','4,5','1,6'], ans:'C' },
   { id:'2016-049', year:2016, q:'如下有關食品微生物實驗室的敘述，何者錯誤？', opts:['應為獨立區域','不能與化學實驗室共用','應為P3以上等級的實驗室','進出房間應為雙門的設計','每15分鐘落菌不得超過15 CFU/培養皿'], ans:'C' },
   { id:'2016-050', year:2016, q:'檢驗食品中病原性大腸桿菌時，將檢體以BHI培養液稀釋，充分混合後，取上層BHI培養液放置35℃培養箱中，培養3小時的目的為何？', opts:['選擇性增菌','抑制非大腸桿菌的生長','讓受損細胞復甦','呈黃色者為酸化陽性','讓檢體自然沉澱'], ans:'C' },
   { id:'2016-051', year:2016, q:'如下食品中毒病原菌中，那些菌為氧化酶陽性革蘭氏陰性桿菌？(1)氣單胞菌(Aeromonas)；(2)耶辛尼氏菌(Yersinia)；(3)曲狀桿菌(Campylobacter)；(4)葡萄球菌(Staphylococcus)；(5)腸炎弧菌(Vibrio parahaemolyticus)；(6)阪崎腸桿菌(Cronobacter sakazaki)', opts:['1,2,3','4,5,6','1,3,5','2,4,6','1,2,6'], ans:'C' },
@@ -1809,7 +1809,7 @@ const QUESTIONS = [
   { id:'2025-100', year:2025, q:'Wagatsuma培養基配製時加入5%(v/v)經生理食鹽水洗滌三次之人或兔之紅血球，搖動混合均勻，請問此培養基用於測定何菌是否具有Kanagawa現象(phenomenon)？', opts:['河弧菌(V. fluvialis)','腸炎弧菌(V. parahaemolyticus)','彎曲桿菌(Campylobacter jejunii)','霍亂弧菌(V. cholerae)','創傷弧菌(Vibrio vulnificus)'], ans:'B' },
 ];
 
-const OPTS = ['A','B','C','D','E'];
+const OPTS = ['A','B','C','D','E','F','G','H','I','J'];
 
 // ═══════════════════════════════════════════════════════════
 // STATE (in-memory)
@@ -2077,7 +2077,7 @@ function showResult() {
   if (wrongs.length === 0) {
     wl.innerHTML = '';
   } else {
-    const keys = ['A','B','C','D','E'];
+    const keys = ['A','B','C','D','E','F','G','H','I','J'];
     try {
       wl.innerHTML = `
         <div class="wrong-review-header">✗ 本次答錯 ${wrongs.length} 題</div>
@@ -2144,7 +2144,7 @@ function renderBank() {
     ${sorted.map(id => {
       const item = state.wrongBank[id];
       const qData = QUESTIONS.find(q => q.id === id);
-      const keys = ['A','B','C','D','E'];
+      const keys = ['A','B','C','D','E','F','G','H','I','J'];
       const cc = item.consecutiveCorrect || 0;
       const isMastered = item.mastered || false;
       const progressTag = isMastered
