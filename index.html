@@ -1208,13 +1208,14 @@ function startQuiz(mode) {
     const weighted = [];
     QUESTIONS.forEach(q => {
       const inWrongBank = !!state.wrongBank[q.id];
-      if (!inWrongBank) {
-        const cc = (state.correctTrack[q.id] || 0);
-        if (cc >= 3 && Math.random() >= 0.2) return; // 連續答對3次→20%機率
-      }
+      if (inWrongBank) return; // 錯題庫題目不進入隨機模式
+      const cc = (state.correctTrack[q.id] || 0);
+      if (cc >= 3 && Math.random() >= 0.2) return; // 連續答對3次→20%機率
+      const neverAttempted = (cc === 0); // 從未作答→雙倍權重
       weighted.push(q);
+      if (neverAttempted) weighted.push(q);
     });
-    pool = shuffle(weighted.length >= 50 ? weighted : QUESTIONS).slice(0, 50);
+    pool = shuffle(weighted.length >= 50 ? weighted : QUESTIONS.filter(q => !state.wrongBank[q.id])).slice(0, 50);
   }
 
   quiz.questions = pool;
